@@ -1,5 +1,5 @@
-const axios = require('axios');
-const { ethers } = require('ethers');
+const axios = require('axios'); // This module installing is required  //npm install axios
+const { ethers } = require('ethers'); // This module installing is required   //npm install axios
 
 
 // Configuration de l'API
