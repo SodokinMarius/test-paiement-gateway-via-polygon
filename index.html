@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Test Metamask Transaction</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.5.3.min.js"></script>
+  </head>
+  <body>
+    <form id="transaction-form">
+      <label for="to-address">To Address:</label>
+      <input type="text" id="to-address" name="to-address" required>
+      <br>
+      <label for="value">Value:</label>
+      <input type="text" id="value" name="value" required>
+      <br>
+      <button type="submit">Send Transaction</button>
+    </form>
+
+
+    <script>
+      const form = document.querySelector('#transaction-form');
+
+
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+
+
+        const toAddress = form.elements['to-address'].value;
+        const value = form.elements['value'].value;
+
+
+        try {
+          // transation creation with the wallet choosed by the user
+          const response = await createTransaction(toAddress, value);
+
+
+          console.log('Transaction created:', response);
+        } catch (error) {
+          console.error('Error creating transaction:', error);
+        }
+      });
+
+
+      async function createTransaction(toAddress, value) {
+        // Let's verify if the wallet is selected and connected
+        if (!window.ethereum) {
+          throw new Error('Metamask is not installed or not connected.');
+        }
+
+
+        // Asking user to select the wallet from which this will make the paiement
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        const fromAddress = accounts[0];
+
+
+        // Create a transaction
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const transaction = {
+          to: toAddress,
+          value: ethers.utils.parseEther(value),
+        };
+        const gasPrice = await provider.getGasPrice();
+        const estimatedGas = await signer.estimateGas(transaction);
+        const gasLimit = parseInt(estimatedGas.mul(1.2).toString());
+        const nonce = await signer.getTransactionCount();
+
+
+        const signedTransaction = await signer.signTransaction({
+          ...transaction,
+          gasPrice: gasPrice.toString(),
+          gasLimit: gasLimit.toString(),
+          nonce: nonce,
+        });
+
+
+        // send signed transation to the blockchain
+        const response = await axios.post('https://api.polygon.io/v1/transactions', { // Not  correct this link, that is to correct
+          tx: signedTransaction,
+        }, {
+          params: {
+            api_key: 'JVI1EdSqy_POsYnpFfHUvwaRMbLp4IPC' // This API key was generated on polygon plateform, it will be used to intract with this blockchain 
+          }
+        });
+
+
+        return response.data;
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "test-crypto-paiement",
+  "version": "1.0.0",
+  "description": "Test crypto paiement gateway with polygon blockchain",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Yao Marius SODOKIN",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.3.4",
+    "ethers": "^6.1.0"
+  }
+}
